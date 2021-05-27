@@ -3,6 +3,7 @@ import java.util.Scanner;
 
 public class App {
     static int opcion;
+    static char op = '\n';
 
     static Scanner input = new Scanner(System.in);
     static String[] usuarios = new String[5];
@@ -13,12 +14,11 @@ public class App {
     static boolean logged_in = false, logged_out = false;
 
     public static void main(String[] args) throws Exception {
-        //inicializar los usuarios y las contraseñas vacias
         for(int i = 0; i < usuarios.length; i++) {
             usuarios[i] = "";
             contrasenas[i] = "";
         }
-
+                
         menu_inicio();
     }
 
@@ -131,7 +131,8 @@ public class App {
     }
 
     public static void jugar() {
-
+        clear();
+        Battleship.tablero();
     }
 
     public static void configuracion() {
@@ -139,7 +140,27 @@ public class App {
     }
 
     public static void reportes() {
+        clear();
 
+        System.out.println("REPORTES\n");
+
+        System.out.println("a. Descripcion de mis ultimos 10 juegos");
+        System.out.println("b. Ranking de jugadores");
+        System.out.println("c. Regresar al menu principal");
+        System.out.print("Opcion: > ");
+        op = input.next().charAt(0);
+
+        switch(opcion) {
+            case 1:
+                System.out.println("DESCRIPCION DE MIS ULTIMOS 10 JUEGOS\n");
+            break;
+            case 2:
+                System.out.println("RANKING DE JUGADORES\n");
+            break;
+            case 3:
+                menu_principal();
+            break;
+        }
     }
 
     public static void mi_perfil() {
