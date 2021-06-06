@@ -10,4 +10,8 @@ public class Battleship {
             System.out.println();
         }
     }
+
+    public static void easy() {
+        tablero();
+    }
 }
