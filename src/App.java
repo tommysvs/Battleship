@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.util.Scanner;
 
 public class App {
@@ -9,29 +8,19 @@ public class App {
     static int opcion; //variable global para los menus que tengan numeros
     static char op = '\n'; //variable global para los menus que tengan letras
 
-    static Scanner input = new Scanner(System.in); //variable global para el scanner
-    static String[] usuarios = new String[2]; //variable global que almacena los usuarios cuando se crean
-    static String[] contrasenas = new String[2]; //variable global que almacena las contrasseñas cuando se crean
-    static int contador_usuarios = 0;
-    static int puntos_usr1 = 0, puntos_usr2 = 0;
-
-    static String usuario, contrasena; //variables para el scanner
-    static boolean logged = false; 
+    static Scanner input = new Scanner(System.in);
+    static String usuario, contrasena; //variables para el ingreso del usuario y de la contraeña
     static String dificultad = "NORMAL";
     static String modo = "TUTORIAL";
 
+    static Functions fn = new Functions();
+
     public static void main(String[] args) throws Exception {
-        //ciclo for para inicialiar la variable 'usuarios' y 'contrasenas' para que no de error de null exception
-        for(int i = 0; i < usuarios.length; i++) {
-            usuarios[i] = "";
-            contrasenas[i] = "";
-        }
-                
         menu_inicio();
     }
 
     public static void menu_inicio() {
-        clear();
+        fn.clear();
         System.out.println("MENU DE INICIO\n");
         System.out.println("1. Login");
         System.out.println("2. Crear player");
@@ -54,83 +43,70 @@ public class App {
     }
 
     public static void login() {
-        clear();
+        fn.clear();
         System.out.println("LOGIN\n");
 
-        System.out.print("Ingrese el usuario: ");
+        System.out.print("Ingresa el usuario: ");
         usuario = input.nextLine();
 
-        for(int i = 0; i < usuarios.length; i++) {
-            if(usuarios[i].equals(usuario)) {
-                System.out.print("Ingrese el contrasena: ");    
-                contrasena = input.nextLine();
+        System.out.print("Ingresa la contrasena: ");    
+        contrasena = input.nextLine();
 
-                if(contrasenas[i].equals(contrasena))
-                    menu_principal();
-                else {
-                    System.out.println("Contraseña incorrecta, intentalo de nuevo");
-                    menu_inicio();
-                }
-            }
+        Player player = new Player();
+
+        if(player.usuario_existe(usuario)) {
+            if(player.index_usuario(usuario) == player.index_contrasena(contrasena))
+                menu_principal();
             else {
-                System.out.println("El usuario ingresado no existe.");
+                System.out.print("\nContraseña incorrecta.");
+                fn.pause();
+
                 menu_inicio();
             }
+        }else {
+            System.out.print("\nEl usuario ingresado no existe.");
+            fn.pause();
+
+            menu_inicio();
         }
     }
 
     public static void crear_player() {
-        clear();
+        fn.clear();
+        
         System.out.println("CREAR PLAYER\n");
 
         System.out.print("Ingrese el usuario: ");
         usuario = input.nextLine();
 
-        System.out.print("Ingrese el contrasena: ");    
+        System.out.print("Ingrese la contrasena: ");    
         contrasena = input.nextLine();
 
-        if(!validar_usuario()) 
+        Player player = new Player();
+
+        if(player.usuario_existe(usuario)) {
+            System.out.print("\nEste usuario ya existe.");
+            fn.pause();
+
             menu_inicio();
+        } else {
+            player.agregar_usuario(usuario, contrasena);
 
-        menu_principal();
-    }
+            System.out.print("\nUsuario creado con exito.");
+            fn.pause();
 
-    public static boolean validar_usuario() {
-        for(int i = 0; i < usuarios.length; i++) {
-            if(contador_usuarios == usuarios.length) {
-                System.out.println("Se excedio el limite de usuarios.");
-                break;
-            }
-
-            if(usuarios[i].equals("")) {
-                usuarios[i] = usuario;
-                contrasenas[i] = contrasena;
-
-                contador_usuarios++;
-
-                break;
-            }else if(usuarios[i + contador_usuarios].equals("")) {
-                usuarios[i + contador_usuarios] = usuario;
-                contrasenas[i + contador_usuarios] = contrasena;
-
-                contador_usuarios++;
-
-                break;
-            }else {
-                return false;
-            }
+            menu_principal();
         }
-
-        return true;
     }
 
     public static void menu_principal() {
-        clear();
+        fn.clear();
+
+        Player player = new Player();
 
         System.out.println("MENU PRINCIPAL\n");
 
-        if(usuario != "")
-            System.out.println("LOGGEADO COMO: " + usuario + "\n");
+        System.out.println("LOGGEADO COMO: " + player.get_usuario() + "\n");
 
         System.out.println("1. Jugar");
         System.out.println("2. Configuracion");
@@ -155,36 +131,33 @@ public class App {
                 mi_perfil();
             break;
             case 5:
-                logged = false;
                 menu_inicio();
             break;
         }
     }
 
     public static void jugar() {
-        clear();
+        fn.clear();
+
+        Player pl = new Player();
+        Battleship bs = new Battleship();
 
         System.out.println("BATTLESHIP \n");
 
         do {
-            System.out.print("Ingrese username del PLAYER 2:");
+            System.out.print("Ingrese username del PLAYER 2: ");
             usuario = input.nextLine();
 
-            System.out.print("Ingrese contrasena del PLAYER 2:");
-            usuario = input.nextLine();
-
-            if(usuario == "EXIT")
+            if(usuario.equals("EXIT")) {
                 menu_principal(); 
+            }
+        }while(!pl.usuario_existe(usuario));
 
-            if(validar_usuario())
-                break;
-        }while(validar_usuario() != false);
-
-        clear();
+        bs.normal();
     }
 
     public static void configuracion() {
-        clear();
+        fn.clear();
 
         System.out.println("CONFIGURACION\n");
 
@@ -196,14 +169,14 @@ public class App {
 
         switch(op) {
             case 'a':
-                clear();
+                fn.clear();
 
                 System.out.println("DIFICULTAD\n");
 
                 configuracion();
             break;
             case 'b':
-                clear();
+                fn.clear();
                 
                 System.out.println("MODO DE JUEGO\n");
 
@@ -227,7 +200,7 @@ public class App {
     }
 
     public static void reportes() {
-        clear();
+        fn.clear();
 
         System.out.println("REPORTES\n");
 
@@ -253,25 +226,36 @@ public class App {
     }
 
     public static void mi_perfil() {
-        clear();
+        fn.clear();
+
+        Player player = new Player();
 
         System.out.println("MI PERFIL\n");
 
         System.out.println("a. Ver mis datos");
         System.out.println("b. Modificar mis datos");
         System.out.println("c. Eliminar cuenta");
-        System.out.println("c. Regresar al menu principal");
+        System.out.println("d. Regresar al menu principal");
         System.out.print("Opcion: > ");
         op = input.next().charAt(0);
 
         switch(op) {
             case 'a':
+                player.ver_datos();
                 mi_perfil();
             break;
             case 'b':
+
                 mi_perfil();
             break;
             case 'c':
+                if(player.eliminar_usuario(usuario))
+                    System.out.println("Usuario eliminado con exito.");
+                else
+                    System.out.println("No se puede eliminar el usuario.");
+
+                fn.pause();
+
                 menu_inicio();
             break;
             case 'd':
@@ -280,14 +264,37 @@ public class App {
         }
     }
 
-    public static void clear() {
-        try {
-            if (System.getProperty("os.name").contains("Windows")) {
-                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-            }
-            else {
-                System.out.print("\033\143");
-            }
-        } catch (IOException | InterruptedException ex) {}
+    public static void modificar_perfil() {
+        Player player = new Player();
+        String nuevo = "";
+
+        System.out.println("MODIFICAR PERFIL DE " + player.get_usuario() + "\n");
+
+        System.out.println("Modificar usuario o contrasena: ");
+        System.out.println("1. Usuario");
+        System.out.println("2. Contrasena");
+        opcion = input.nextInt();
+
+        switch(opcion) {
+            case 1:
+                System.out.print("Ingresa el nuevo usuario: ");
+                nuevo = input.nextLine();
+            break;
+            case 2:
+                System.out.print("Ingresa la nueva contrasena: ");
+                nuevo = input.nextLine();
+            break;
+            default:
+                System.out.println("Opcion no valida.");
+                mi_perfil();
+            break;
+        }
+
+        player.modificar_usuario(usuario, nuevo, op);
+
+        System.out.print("Usuario modificado exitosamente.");
+        fn.pause();
+
+        menu_inicio();
     }
 }
