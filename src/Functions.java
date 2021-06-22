@@ -1,9 +1,9 @@
 import java.io.IOException;
 
 public class Functions {
-    public void pause() {
+    public void pause(int n) {
         try {  
-            Thread.sleep(1400);  
+            Thread.sleep(n);  
         }catch(InterruptedException e){
             System.out.println(e);    
         }    

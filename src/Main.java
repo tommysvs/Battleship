@@ -1,19 +1,16 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 
-public class App {
-    //constantes para definir la dificultad del juego y el modo de juego
-    static String[] dificultad_const = {"EASY", "NORMAL", "EXPERT", "GENIUS"};
-    static String[] modo_const = {"ARCADE", "TUTORIAL"};
-
+public class Main {
     static int opcion; //variable global para los menus que tengan numeros
     static char op = '\n'; //variable global para los menus que tengan letras
 
     static Scanner input = new Scanner(System.in);
     static String usuario, contrasena; //variables para el ingreso del usuario y de la contraeña
-    static String dificultad = "NORMAL";
-    static String modo = "TUTORIAL";
 
-    static Functions fn = new Functions();
+    static Functions fn = new Functions(); //variable global para funciones
+    static Player player = new Player(); //variable global para el player 1
+    static Battleship bs = new Battleship(); //variable global para battleship
 
     public static void main(String[] args) throws Exception {
         menu_inicio();
@@ -52,20 +49,22 @@ public class App {
         System.out.print("Ingresa la contrasena: ");    
         contrasena = input.nextLine();
 
-        Player player = new Player();
-
         if(player.usuario_existe(usuario)) {
-            if(player.index_usuario(usuario) == player.index_contrasena(contrasena))
+            if(player.index_usuario(usuario) == player.index_contrasena(contrasena)) {
+                player.set_usuario_logged(usuario);
+                player.set_logged_in();
+
                 menu_principal();
+            }
             else {
                 System.out.print("\nContraseña incorrecta.");
-                fn.pause();
+                fn.pause(1400);
 
                 menu_inicio();
             }
         }else {
             System.out.print("\nEl usuario ingresado no existe.");
-            fn.pause();
+            fn.pause(1400);
 
             menu_inicio();
         }
@@ -82,27 +81,25 @@ public class App {
         System.out.print("Ingrese la contrasena: ");    
         contrasena = input.nextLine();
 
-        Player player = new Player();
-
         if(player.usuario_existe(usuario)) {
             System.out.print("\nEste usuario ya existe.");
-            fn.pause();
+            fn.pause(1400);
 
             menu_inicio();
         } else {
             player.agregar_usuario(usuario, contrasena);
 
             System.out.print("\nUsuario creado con exito.");
-            fn.pause();
+            fn.pause(1400);
 
+            player.set_usuario_logged(usuario);
+            player.set_logged_in();
             menu_principal();
         }
     }
 
     public static void menu_principal() {
         fn.clear();
-
-        Player player = new Player();
 
         System.out.println("MENU PRINCIPAL\n");
 
@@ -131,6 +128,8 @@ public class App {
                 mi_perfil();
             break;
             case 5:
+                player.set_logged_off();
+                player.set_usuario_logged("");
                 menu_inicio();
             break;
         }
@@ -139,19 +138,9 @@ public class App {
     public static void jugar() {
         fn.clear();
 
-        Player pl = new Player();
         Battleship bs = new Battleship();
 
         System.out.println("BATTLESHIP \n");
-
-        do {
-            System.out.print("Ingrese username del PLAYER 2: ");
-            usuario = input.nextLine();
-
-            if(usuario.equals("EXIT")) {
-                menu_principal(); 
-            }
-        }while(!pl.usuario_existe(usuario));
 
         bs.normal();
     }
@@ -172,6 +161,17 @@ public class App {
                 fn.clear();
 
                 System.out.println("DIFICULTAD\n");
+                System.out.println("MODO DE JUEGO\n");
+
+                System.out.println("1. EASY");
+                System.out.println("2. NORMAL");
+                System.out.println("3. EXPERT");
+                System.out.println("4. GENIUS");
+                System.out.print("Opcion: > ");
+                opcion = input.nextInt();
+                input.nextLine();
+
+                bs.set_dificultad(opcion);
 
                 configuracion();
             break;
@@ -186,10 +186,7 @@ public class App {
                 opcion = input.nextInt();
                 input.nextLine();
 
-                if(opcion == 1)
-                    modo = modo_const[0]; //arcade
-                else
-                    modo = modo_const[1]; //tutorial
+                bs.set_modo(opcion);
 
                 configuracion();
             break;
@@ -210,12 +207,21 @@ public class App {
         System.out.print("Opcion: > ");
         op = input.next().charAt(0);
 
-        switch(opcion) {
+        switch(op) {
             case 'a':
+                fn.clear();
                 System.out.println("DESCRIPCION DE MIS ULTIMOS 10 JUEGOS\n");
+
+                player.show_juegos();
+                fn.pause(5000);
+
+                reportes();
             break;
             case 'b':
+                fn.clear();
                 System.out.println("RANKING DE JUGADORES\n");
+
+                player.show_ranking();
 
                 reportes();
             break;
@@ -228,8 +234,6 @@ public class App {
     public static void mi_perfil() {
         fn.clear();
 
-        Player player = new Player();
-
         System.out.println("MI PERFIL\n");
 
         System.out.println("a. Ver mis datos");
@@ -241,20 +245,53 @@ public class App {
 
         switch(op) {
             case 'a':
+                fn.clear();
+
+                System.out.println("DATOS DEL USUARIO\n");
+
                 player.ver_datos();
+                fn.pause(4000);
+
                 mi_perfil();
             break;
             case 'b':
+                fn.clear();
+                System.out.println("Que dato desea modificar");
+                System.out.println("1. Usuario");
+                System.out.println("2. Contrasena");
+                System.out.print("Opcion: > ");
+                opcion = input.nextInt();
+                input.nextLine();
+
+                String nuevo = "";
+
+                if(opcion == 1) {
+                    System.out.print("Ingrese el nuevo usuario: ");
+                    nuevo = input.nextLine();
+                }else if(opcion == 2) {
+                    System.out.print("Ingrese la nueva contrasena: ");
+                    nuevo = input.nextLine();
+                }
+
+                player.modificar_usuario(usuario, nuevo, opcion);
+
+                if(opcion == 1)
+                    System.out.println("El usuario ha sido modificado con exito.");
+                else if(opcion == 2)
+                    System.out.print("La contrasena ha sido modificada con exito.");
+                
+                fn.pause(1400);
 
                 mi_perfil();
             break;
             case 'c':
+                fn.clear();
                 if(player.eliminar_usuario(usuario))
                     System.out.println("Usuario eliminado con exito.");
                 else
                     System.out.println("No se puede eliminar el usuario.");
 
-                fn.pause();
+                fn.pause(1400);
 
                 menu_inicio();
             break;
@@ -265,7 +302,6 @@ public class App {
     }
 
     public static void modificar_perfil() {
-        Player player = new Player();
         String nuevo = "";
 
         System.out.println("MODIFICAR PERFIL DE " + player.get_usuario() + "\n");
@@ -274,6 +310,7 @@ public class App {
         System.out.println("1. Usuario");
         System.out.println("2. Contrasena");
         opcion = input.nextInt();
+        input.nextLine();
 
         switch(opcion) {
             case 1:
@@ -293,7 +330,7 @@ public class App {
         player.modificar_usuario(usuario, nuevo, op);
 
         System.out.print("Usuario modificado exitosamente.");
-        fn.pause();
+        fn.pause(1400);
 
         menu_inicio();
     }
