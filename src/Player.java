@@ -11,6 +11,10 @@ public class Player {
 
     Player() { }
 
+    Player(String _usuario_loggeado) { 
+        usuario_loggeado = _usuario_loggeado;
+    }
+
     public void ver_datos() {
         int index = index_usuario(usuario_loggeado);
 
@@ -106,5 +110,9 @@ public class Player {
 
     public Boolean get_logged() {
         return logged;
+    }
+
+    public void set_puntaje(int index, int puntaje) {
+        puntajes.add(index, puntaje);
     }
 }

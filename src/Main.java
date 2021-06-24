@@ -142,7 +142,15 @@ public class Main {
 
         System.out.println("BATTLESHIP \n");
 
-        bs.normal();
+        do {
+            System.out.print("Ingrese el username del PLAYER 2: ");
+            usuario = input.nextLine();
+        }while(player.usuario_existe(usuario) == false);
+
+        if(usuario == "EXIT" || usuario == "exit")
+            menu_principal();
+
+        bs.jugar(usuario);
     }
 
     public static void configuracion() {
