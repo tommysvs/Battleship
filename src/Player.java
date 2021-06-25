@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class Player {
+public class Player extends Main {
     ArrayList<String> usuarios = new ArrayList<String>();
     ArrayList<String> contrasenas = new ArrayList<String>();
     ArrayList<Integer> puntajes = new ArrayList<Integer>();
@@ -27,14 +27,14 @@ public class Player {
         puntajes.add(0);
     }
 
-    public void modificar_usuario(String usuario, String nuevo, int op) {
+    public void modificar_usuario(String usuario, String nuevo, int _op) {
         int index = index_usuario(usuario);
 
-        if(op == 1) {
+        if(_op == 1) {
             usuarios.set(index, nuevo);
             set_usuario_logged(nuevo);
         }
-        else if(op == 2)
+        else if(_op == 2)
             contrasenas.set(index, nuevo);
     }
 
@@ -76,9 +76,8 @@ public class Player {
 
     public boolean usuario_existe(String usuario) {
         for(String x : usuarios) {
-            if(x.equals(usuario)) {
+            if(x.equals(usuario))
                 return true;
-            }
         }
 
         return false;
@@ -114,5 +113,9 @@ public class Player {
 
     public void set_puntaje(int index, int puntaje) {
         puntajes.add(index, puntaje);
+    }
+
+    public void set_juego(String descripcion) {
+        ultimos_juegos.add(descripcion);
     }
 }
